@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Tarefas Domésticas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestão de Tarefas Domésticas</h1>
+
+        <!-- Formulário para definir o estado do ambiente -->
+        <form id="estado-form">
+            <label>Pratos Sujos: <input type="number" name="pratos_sujos" min="0" max="20" value="15"></label>
+            <label>Nível Sujeira Chão: <input type="number" name="nivel_sujeira_chao" min="0" max="5" value="3"></label>
+            <label>Umidade Plantas: <input type="number" name="umidade_plantas" min="0" max="5" value="2"></label>
+            <label>Nível Lixo: <input type="number" name="nivel_lixo" min="0" max="5" value="4"></label>
+            <label>Nível Poeira: <input type="number" name="nivel_poeira" min="0" max="5" value="3"></label>
+            <label>Roupas Sujas: <input type="number" name="roupas_sujas" min="0" max="20" value="12"></label>
+            <button type="submit">Atualizar Valores</button>
+        </form>
+
+        <button id="executar-btn">Executar Tarefas</button>
+        <ul id="resultado-tarefas"></ul>
+    </div>
+
+    <script>
+        document.getElementById('estado-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/atualizar_estado', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            }).then(response => response.json())
+              .then(response => {
+                  alert(response.message);
+              });
+        });
+
+        document.getElementById('executar-btn').addEventListener('click', function() {
+            fetch('/executar_tarefas')
+            .then(response => response.json())
+            .then(data => {
+                let resultadoTarefas = document.getElementById('resultado-tarefas');
+                resultadoTarefas.innerHTML = '';
+                data.forEach(item => {
+                    let li = document.createElement('li');
+                    li.textContent = item;
+                    resultadoTarefas.appendChild(li);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
